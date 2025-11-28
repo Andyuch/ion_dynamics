@@ -87,7 +87,7 @@ class IonTransportSimulator:
         self.f_term = FARADAY / (R_GAS * config.kinetics.temperature_K)
         red_conc = self.species[0].concentration()
         self.k0 = config.kinetics.rate_constant(red_conc)
-        self._compiled_step = jax.jit(self._step_impl, static_argnums=(0,))
+        self._compiled_step = jax.jit(self._step_impl)
         self.adsorption_layer = None
 
     def _initialize_concentrations(self) -> jnp.ndarray:
