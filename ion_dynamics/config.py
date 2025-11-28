@@ -91,11 +91,11 @@ class ElectrodeConfig:
 @dataclass
 class SimulationConfig:
     species: Sequence[SpeciesConfig]
-    grid: SimulationGridConfig = SimulationGridConfig()
-    time: TimeConfig = TimeConfig()
-    outputs: OutputConfig = OutputConfig()
+    grid: SimulationGridConfig = field(default_factory=SimulationGridConfig)
+    time: TimeConfig = field(default_factory=TimeConfig)
+    outputs: OutputConfig = field(default_factory=OutputConfig)
     electrodes: Sequence[ElectrodeConfig] = field(default_factory=list)
-    kinetics: ButlerVolmerConfig = ButlerVolmerConfig()
+    kinetics: ButlerVolmerConfig = field(default_factory=ButlerVolmerConfig)
     supporting_electrolyte_mM: float = 100.0
     viscosity_Pa_s: float = 1.0e-3
 
