@@ -20,44 +20,15 @@ R_GAS = 8.314
 
 
 def gradient(field: jnp.ndarray, spacing: Tuple[float, float, float]) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
-    grads = []
-    for axis, h in enumerate(spacing):
-        pad = [(0, 0)] * field.ndim
-        pad[axis] = (1, 1)
-        padded = jnp.pad(field, pad, mode="edge")
-        slices_f = []
-        slices_b = []
-        for dim in range(field.ndim):
-            if dim == axis:
-                slices_f.append(slice(2, None))
-                slices_b.append(slice(None, -2))
-            else:
-                slices_f.append(slice(1, -1))
-                slices_b.append(slice(1, -1))
-        forward = padded[tuple(slices_f)]
-        backward = padded[tuple(slices_b)]
-        grads.append((forward - backward) / (2.0 * h))
+    grads = jnp.gradient(field, *spacing, edge_order=2)
     return tuple(grads)
 
 
 def divergence(components: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray], spacing: Tuple[float, float, float]) -> jnp.ndarray:
     accum = jnp.zeros_like(components[0])
     for axis, (comp, h) in enumerate(zip(components, spacing)):
-        pad = [(0, 0)] * comp.ndim
-        pad[axis] = (1, 1)
-        padded = jnp.pad(comp, pad, mode="edge")
-        slices_f = []
-        slices_b = []
-        for dim in range(comp.ndim):
-            if dim == axis:
-                slices_f.append(slice(2, None))
-                slices_b.append(slice(None, -2))
-            else:
-                slices_f.append(slice(1, -1))
-                slices_b.append(slice(1, -1))
-        forward = padded[tuple(slices_f)]
-        backward = padded[tuple(slices_b)]
-        accum = accum + (forward - backward) / (2.0 * h)
+        deriv = jnp.gradient(comp, h, axis=axis, edge_order=2)
+        accum = accum + deriv
     return accum
 
 
@@ -74,7 +45,7 @@ class IonTransportSimulator:
     def __init__(self, config: SimulationConfig):
         self.config = config
         self.grid = SimulationGrid(config.grid)
-        self.spacing = jnp.array(self.grid.spacing_cm)
+        self.spacing = self.grid.spacing_cm
         self.species = config.species
         self.n_species = len(self.species)
         self.diffusion = jnp.array([sp.diffusion() for sp in self.species])
