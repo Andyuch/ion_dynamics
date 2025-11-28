@@ -20,14 +20,14 @@ R_GAS = 8.314
 
 
 def gradient(field: jnp.ndarray, spacing: Tuple[float, float, float]) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
-    grads = jnp.gradient(field, *spacing, edge_order=2)
+    grads = jnp.gradient(field, *spacing)
     return tuple(grads)
 
 
 def divergence(components: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray], spacing: Tuple[float, float, float]) -> jnp.ndarray:
     accum = jnp.zeros_like(components[0])
     for axis, (comp, h) in enumerate(zip(components, spacing)):
-        deriv = jnp.gradient(comp, h, axis=axis, edge_order=2)
+        deriv = jnp.gradient(comp, h, axis=axis)
         accum = accum + deriv
     return accum
 
