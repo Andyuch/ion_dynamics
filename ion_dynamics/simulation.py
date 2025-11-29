@@ -128,8 +128,8 @@ class IonTransportSimulator:
         eta: float,
     ) -> Tuple[jnp.ndarray, jnp.ndarray]:
         updated = concentrations
-        grad_phi = gradient(phi_field, tuple(self.spacing))
         spacing = tuple(self.spacing)
+        grad_phi = gradient(phi_field, spacing)
         for idx in range(self.n_species):
             lap = laplacian(updated[idx], spacing)
             migr = divergence(
